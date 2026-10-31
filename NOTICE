@@ -1,0 +1,19 @@
+dsh-fakeip-web-fetch
+Copyright (c) 2026 lone-wolf-akela
+
+This product includes software derived from DeepSeek Harness:
+
+  @deepseek-ai/dsh-web-fetch-http
+  Copyright (c) DeepSeek
+  License: MIT
+  Source: https://github.com/deepseek-ai/deepseek-harness (packages/web/web-fetch-http)
+
+Derived material: the hostname-resolution and NAT64-translation logic in
+lib/address-policy.js, and the provider limit validation in lib/index.js, which
+reproduce the corresponding upstream rules with an additional fake-IP address
+allowance. The provider transport itself is not copied; it is instantiated from
+the installed upstream package.
+
+  ipaddr.js
+  License: MIT
+  Source: https://github.com/whitequark/ipaddr.js

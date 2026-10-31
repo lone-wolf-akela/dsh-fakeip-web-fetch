@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Fake-IP Web Fetch",
+    "description": "Anonymous HTTP(S) web_fetch for fake-IP DNS setups (Clash/mihomo, OpenClash, sing-box, Surge): the stock provider's non-public address guard is widened to the local fake-IP pool only, so loopback, RFC 1918 and link-local destinations stay blocked."
+  }
+}

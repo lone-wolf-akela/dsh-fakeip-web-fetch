@@ -1,0 +1,36 @@
+# dsh-fakeip-web-fetch — the bundle layer.
+#
+# `dsh plugin --profile <name> add @lone-wolf-akela/dsh-fakeip-web-fetch`
+# appends this package to the profile's `dsh.profile.bundles`; the next profile
+# boot applies THIS layer, after every bundle shipped before it.
+#
+# Why two rows instead of one override:
+#
+#   * On a non-insert patch, `name` is a GUARD, not a reassignment: the loader
+#     keeps `id` plus the remaining overrides and skips the patch when `name`
+#     does not equal the target row's name. The stock provider row therefore
+#     cannot be re-pointed in place, and a second provider registered under the
+#     same id is rejected by `ctx.web` (`WEB_DUPLICATE_PROVIDER`). The stock row
+#     is DISABLED here and our provider is inserted as its own row.
+#
+#   * The provider registers under the SAME id as the stock one ("http"), so the
+#     `web` row's `fetchProvider: http` and any user configuration that pins
+#     `http` keep resolving to a fetch provider unchanged.
+#
+# Every other field of the stock row (limits, user agent) is reproduced by the
+# inserted row's Config schema, so behavior differs only in which non-public
+# addresses are accepted. See README.md for the address policy.
+
+# The stock anonymous fetch provider refuses every non-public address — which
+# includes the whole fake-IP pool a fake-IP DNS hands out. Disable it; the row
+# below is its replacement.
+- id: web-fetch-http
+  name: "@deepseek-ai/dsh-web-fetch-http"
+  disabled: true
+
+# The fake-IP-aware replacement. It instantiates the stock provider class with a
+# resolver of its own, so transport, redirect, byte-cap and charset behavior are
+# the upstream implementation, not a copy.
+- insert:
+    - id: web-fetch-fakeip
+      name: "@lone-wolf-akela/dsh-fakeip-web-fetch"

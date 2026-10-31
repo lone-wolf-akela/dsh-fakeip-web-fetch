@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Fake-IP 网页抓取",
+    "description": "为 fake-IP DNS（Clash/mihomo、OpenClash、sing-box、Surge）准备的匿名 HTTP(S) web_fetch：只把非公网地址校验放宽到本地 fake-IP 池，回环、RFC 1918 与链路本地地址仍然拒绝。"
+  }
+}
