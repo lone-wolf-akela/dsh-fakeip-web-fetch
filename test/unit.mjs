@@ -56,6 +56,8 @@ test('IPv4-mapped IPv6 is classified by its embedded IPv4 address', () => {
 
 test('default IPv6 allowlist covers mihomo and sing-box fake pools, not a LAN ULA', () => {
 	const allow = createAllowlist({})
+	assert.equal(classifyAddress('64:ff9b::2b', allow), 'fake-ip')
+	assert.equal(classifyAddress('64:ff9b::808:808', allow), 'fake-ip')
 	assert.equal(classifyAddress('fdfe:dcba:9876::1', allow), 'fake-ip')
 	assert.equal(classifyAddress('fc00::1', allow), 'fake-ip')
 	assert.equal(classifyAddress('fc00:3fff::1', allow), 'fake-ip')
@@ -160,15 +162,27 @@ test('NAT64 answers that translate to a non-public IPv4 are refused', async () =
 	assert.deepEqual(await resolve('public.example', live()), [answer(`${prefix}808:808`, 6)])
 })
 
-test('the standard NAT64 prefix stays refused as a non-public destination', async () => {
-	const table = {
-		'ipv4only.arpa': [answer('64:ff9b::c000:aa', 6)],
-		'nat64.example': [answer('64:ff9b::808:808', 6)]
+test('the NAT64 prefix works as a dual-stack fake pool until DNS64 is active', async () => {
+	// Without DNS64, ipv4only.arpa has no AAAA answer, so a fake pool inside
+	// 64:ff9b::/96 is accepted exactly like the 198.18.0.0/15 IPv4 pool.
+	const plain = {
+		'ipv4only.arpa': [answer('192.0.0.170', 4)],
+		'dual.example': [answer('64:ff9b::2b', 6)]
 	}
-	const resolve = createAddressResolver({}, { lookup: lookupOf(table) })
+	assert.deepEqual(
+		await createAddressResolver({}, { lookup: lookupOf(plain) })('dual.example', live()),
+		[answer('64:ff9b::2b', 6)]
+	)
+
+	// Once a real DNS64 prefix is discovered, an address inside it that
+	// embeds a private IPv4 is still refused.
+	const dns64 = {
+		'ipv4only.arpa': [answer('64:ff9b::c000:aa', 6)],
+		'nat64.example': [answer('64:ff9b::7f00:1', 6)]
+	}
 	await assert.rejects(
-		() => resolve('nat64.example', live()),
-		(error) => error.code === 'WEB_BLOCKED_URL' && /non-public IP address/.test(error.message)
+		() => createAddressResolver({}, { lookup: lookupOf(dns64) })('nat64.example', live()),
+		(error) => error.code === 'WEB_BLOCKED_URL' && /NAT64/.test(error.message)
 	)
 })
 

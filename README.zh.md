@@ -30,7 +30,7 @@ Error: URL hostname "cn-sec.com" resolves to a non-public IP address
 
 * 公网单播地址（`range() === 'unicast'`），与原来一致；
 * 落在 `fakeIpV4Cidrs` 内的地址，默认 `198.18.0.0/15`（RFC 2544 基准测试段；OpenClash 默认的 `198.18.0.1/16` 与 sing-box 的 `198.18.0.0/15` 都是它的子集）；
-* 落在 `fakeIpV6Cidrs` 内的地址，默认 `fdfe:dcba:9876::/64`（mihomo 文档中的 `fake-ip-range6`）与 `fc00::/18`（sing-box 及部分 OpenClash 模板）；
+* 落在 `fakeIpV6Cidrs` 内的地址，默认 `64:ff9b::/96`（mihomo/OpenClash 常把 NAT64 前缀当作双栈 fake 池，与 IPv4 池同序号配对）、`fdfe:dcba:9876::/64`（mihomo 文档中的 `fake-ip-range6`）与 `fc00::/18`（sing-box 及部分 OpenClash 模板）；
 * 上述地址的 IPv4-mapped IPv6 写法（`::ffff:198.18.0.63`）。
 
 仍然拒绝：
@@ -74,7 +74,7 @@ dsh plugin --profile <profile> add @lone-wolf-akela/dsh-fakeip-web-fetch
 | 字段 | 默认值 | 含义 |
 |---|---|---|
 | `fakeIpV4Cidrs` | `['198.18.0.0/15']` | fake-IP 解析器可能给出的 IPv4 池 |
-| `fakeIpV6Cidrs` | `['fdfe:dcba:9876::/64', 'fc00::/18']` | fake-IP 解析器可能给出的 IPv6 池 |
+| `fakeIpV6Cidrs` | `['64:ff9b::/96', 'fdfe:dcba:9876::/64', 'fc00::/18']` | fake-IP 解析器可能给出的 IPv6 池 |
 | `maxResponseBytes` | `5000000` | 响应体字节上限 |
 | `maxBodyChars` | `100000` | 解码后字符上限 |
 | `timeoutMs` | `30000` | 抓取超时 |
@@ -120,6 +120,7 @@ nslookup -type=AAAA www.google.com # 例如 fdfe:dcba:9876::5
 * 依赖 `@deepseek-ai/dsh-web-fetch-http` 导出 `HttpFetchProvider`；不导出时本插件包激活失败并给出诊断。
 * `ipaddr.js` 把 `64:ff9b::/96` 归类为 NAT64 而非单播，因此标准 NAT64 前缀即使在转换后是公网 IPv4 也会被拒绝 —— 与上游一致。
 * 仅当解析器返回 AAAA 时 IPv6 池才会生效；代理侧关闭 IPv6 时，提供方根本收不到 AAAA 地址。
+* 若 fake 池借用了 `64:ff9b::/96`，而网络里 DNS64 真的生效，该前缀内嵌私网 IPv4 的地址会被 NAT64 校验拒绝，于是这个 fake 池在该网络下不再可用。
 * 本插件包替换了提供方；其他插件包或用户补丁若引用上游行 id 的配置，需要改到新的行 id。
 
 ## 开发

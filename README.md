@@ -28,7 +28,7 @@ Accepted:
 
 * public unicast addresses (`range() === 'unicast'`), exactly as before;
 * addresses inside `fakeIpV4Cidrs` — default `198.18.0.0/15` (RFC 2544 benchmarking space; OpenClash's default `198.18.0.1/16` and sing-box's `198.18.0.0/15` are subsets);
-* addresses inside `fakeIpV6Cidrs` — default `fdfe:dcba:9876::/64` (mihomo's documented `fake-ip-range6`) and `fc00::/18` (sing-box and several OpenClash templates);
+* addresses inside `fakeIpV6Cidrs` — default `64:ff9b::/96` (the NAT64 prefix mihomo/OpenClash reuse as a dual-stack fake pool, index-paired with the IPv4 pool), `fdfe:dcba:9876::/64` (mihomo's documented `fake-ip-range6`) and `fc00::/18` (sing-box and several OpenClash templates);
 * IPv4-mapped IPv6 forms of the above (`::ffff:198.18.0.63`).
 
 Still refused:
@@ -72,7 +72,7 @@ All fields are optional; the row works with an empty `config`.
 | Field | Default | Meaning |
 |---|---|---|
 | `fakeIpV4Cidrs` | `['198.18.0.0/15']` | IPv4 pools a fake-IP resolver may hand out |
-| `fakeIpV6Cidrs` | `['fdfe:dcba:9876::/64', 'fc00::/18']` | IPv6 pools a fake-IP resolver may hand out |
+| `fakeIpV6Cidrs` | `['64:ff9b::/96', 'fdfe:dcba:9876::/64', 'fc00::/18']` | IPv6 pools a fake-IP resolver may hand out |
 | `maxResponseBytes` | `5000000` | response body cap |
 | `maxBodyChars` | `100000` | decoded character cap |
 | `timeoutMs` | `30000` | fetch timeout |
@@ -118,6 +118,7 @@ The fetch remains anonymous: no cookies, no ambient credentials, no request head
 * Depends on `@deepseek-ai/dsh-web-fetch-http` exporting `HttpFetchProvider`; the bundle fails activation with a diagnostic when it does not.
 * `ipaddr.js` classifies `64:ff9b::/96` as NAT64 rather than unicast, so the standard NAT64 prefix is refused even when it would translate to a public IPv4 — same as upstream.
 * IPv6 pools take effect only when the resolver returns AAAA answers. With IPv6 disabled in the proxy, no AAAA address ever reaches the provider.
+* A fake pool inside `64:ff9b::/96` and a genuinely active DNS64 share one prefix. When the provider discovers a DNS64 prefix, addresses in it that embed a private IPv4 fail the NAT64 check, so a fake pool there stops resolving on such a network.
 * The bundle replaces the provider; other bundles or user patches that reference the stock row's config must move to the new row id.
 
 ## Development
