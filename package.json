@@ -1,7 +1,7 @@
 {
   "name": "@lone-wolf-akela/dsh-fakeip-web-fetch",
-  "version": "0.1.1",
-  "description": "DSH bundle that keeps web_fetch working behind a fake-IP DNS (Clash/mihomo, sing-box, Surge): it replaces the anonymous HTTP fetch provider with the same provider widened to accept the local fake-IP pool, while loopback, RFC 1918, link-local and carrier-grade NAT destinations stay blocked.",
+  "version": "0.1.2",
+  "description": "Obsolete on DSH >= 0.2.2-rc.1 (web fetch no longer restricts addresses); kept for DSH 0.2.1.x only. DSH bundle that keeps web_fetch working behind a fake-IP DNS (Clash/mihomo, sing-box, Surge): it replaces the anonymous HTTP fetch provider with the same provider widened to accept the local fake-IP pool, while loopback, RFC 1918, link-local and carrier-grade NAT destinations stay blocked.",
   "type": "module",
   "license": "MIT",
   "author": "lone-wolf-akela",

@@ -2,6 +2,11 @@
 
 [English](README.md) | 中文
 
+> **在 DSH >= 0.2.2-rc.1 上已废弃。** DSH 0.2.2 移除了 `web_fetch` 的非公网地址
+> 限制：`@deepseek-ai/dsh-web-fetch-http` 不再解析、也不再钉扎地址，本插件包已经
+> 没有需要放宽的规则，它当年的注入点也不复存在。请从 profile 中卸载本包；这个
+> 仓库只为仍停留在 DSH 0.2.1.x、还会被 `198.18.0.0/15` 拦住的部署保留。
+
 一个 [DeepSeek Harness](https://github.com/deepseek-ai) 插件包：让 `web_fetch` 工具在 **fake-IP** DNS 环境下继续可用，适用于 Clash/mihomo、OpenClash、sing-box、Surge 等所有从保留地址池里回答被代理域名的方案。
 
 ```

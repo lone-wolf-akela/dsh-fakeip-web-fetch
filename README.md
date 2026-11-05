@@ -1,5 +1,12 @@
 # dsh-fakeip-web-fetch
 
+> **Obsolete on DSH >= 0.2.2-rc.1.** DSH 0.2.2 removed the non-public address
+> guard from `web_fetch`: `@deepseek-ai/dsh-web-fetch-http` no longer resolves or
+> pins addresses at all, so there is nothing left for this bundle to relax — and
+> the injection point it used is gone. Remove the bundle from the profile; this
+> repository is kept only for DSH 0.2.1.x deployments that still need the
+> fake-IP exception, where the stock provider refuses `198.18.0.0/15`.
+
 A [DeepSeek Harness](https://github.com/deepseek-ai) bundle that keeps the `web_fetch` tool working behind a **fake-IP** DNS — Clash/mihomo, OpenClash, sing-box, Surge, and anything else that answers proxied hostnames from a reserved pool.
 
 ```
